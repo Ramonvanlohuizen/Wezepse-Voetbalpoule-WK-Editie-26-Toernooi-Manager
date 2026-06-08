@@ -335,11 +335,7 @@ function renderAlleRondes(){
         <div>
           <div class="ronde-naam">${r.name}</div>`;
     if(r.periode)html+=`<div class="ronde-sub">📅 ${r.periode}</div>`;
-    if(r.eerste)html+=`<div class="ronde-sub" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-        <span>⚽ ${r.eerste}</span>
-        <span style="color:var(--text3);">→</span>
-        <span>${r.laatste}</span>
-      </div>`;
+    if(r.eerste)html+=`<div class="ronde-sub">⚽ ${r.eerste} <span style="color:var(--text3)">t/m</span> ${r.laatste}</div>`;
     if(r.deelnemers.length>0)html+=`<div class="ronde-sub">${r.deelnemers.length} deeln. · pot €${pot}${r.inleg===20?' · <span style="color:var(--orange)">Superronde</span>':''}</div>`;
     html+=`</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
           <span class="ronde-badge ${badgeCls}">${badgeTxt}</span>
