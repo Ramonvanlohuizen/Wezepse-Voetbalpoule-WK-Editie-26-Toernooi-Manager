@@ -332,11 +332,11 @@ function renderAlleRondes(){
         <div>
           <div class="ronde-naam">${r.name}</div>`;
     if(r.periode)html+=`<div class="ronde-sub">📅 ${r.periode}</div>`;
-    if(r.eerste)html+=`<div class="ronde-sub">⚽ ${r.eerste} <span style="color:var(--text3)">t/m</span> ${r.laatste}</div>`;
+    if(r.eerste)html+=`<div class="ronde-sub" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">⚽ ${r.eerste} · ${r.laatste}</div>`;
     if(r.deelnemers.length>0)html+=`<div class="ronde-sub">${r.deelnemers.length} deeln. · pot €${pot}${r.inleg===20?' · <span style="color:var(--orange)">Superronde</span>':''}</div>`;
     html+=`</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
           <span class="ronde-badge ${badgeCls}">${badgeTxt}</span>
-          <span id="arr-${i}" style="color:var(--text3);font-size:12px;">▼</span>
+          <span id="arr-${i}" style="color:var(--text3);font-size:12px;">${openDetails.has(i)?"▲":"▼"}</span>
         </div>
       </div>`;
     if(gesloten&&r.winner1){
@@ -353,8 +353,7 @@ function renderAlleRondes(){
       </div>`;
     }
     // Detail sectie
-    html+=`<div id="detail-${i}" style="display:none;">
-      <div class="ronde-detail">`;
+    html+=`<div id="detail-${i}" style="display:${openDetails.has(i)?'block':'none'};"><div class="ronde-detail">`;
     // Admin beheer
     if(isAdmin){
       html+=`<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px;">Deelnemers</div>
@@ -390,17 +389,16 @@ function renderAlleRondes(){
   });
   el.innerHTML=html||'<div class="empty">Geen rondes.</div>';
 }
+const openDetails=new Set();
 function toggleDetail(idx){
-  const el=document.getElementById('detail-'+idx);
-  const arr=document.getElementById('arr-'+idx);
-  if(!el)return;
-  const open=el.style.display!=='none';
-  el.style.display=open?'none':'block';
-  if(arr)arr.textContent=open?'▼':'▲';
+  if(openDetails.has(idx))openDetails.delete(idx);
+  else openDetails.add(idx);
+  renderAlleRondes();
 }
 function toggleDeelnemer(rIdx,naam){
   const r=state.rondes[rIdx];const i=r.deelnemers.indexOf(naam);
   if(i>=0)r.deelnemers.splice(i,1);else r.deelnemers.push(naam);
+  openDetails.add(rIdx);
   queueSave();renderStand();renderAlleRondes();
 }
 function setScore(input){
