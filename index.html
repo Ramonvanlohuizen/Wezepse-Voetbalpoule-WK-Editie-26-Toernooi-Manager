@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 <title>Wezepse Voetbalpoule WK 2026</title>
 <style>
 :root{
@@ -504,7 +504,7 @@ function renderRondesOverzicht() {
   state.rounds.forEach((r, i) => {
     const isAfgelopen = r.winner1 && r.winner2;
     const isActief = !isAfgelopen && r.participants.length > 0;
-    const isPot = r.participants.length * r.inleg;
+    const pot = r.participants.length * r.inleg;
 
     let cls = 'ronde-kaart';
     let badge = '';
@@ -518,39 +518,70 @@ function renderRondesOverzicht() {
       badge = '<span class="ronde-badge badge-gepland">📅 Gepland</span>';
     }
 
-    html += `<div class="${cls}">`;
+    html += `<div class="${cls}" onclick="toggleRondeDetail(${i})" style="cursor:pointer;">`;
     html += `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
-      <span class="ronde-naam">${r.name}</span>${badge}
+      <span class="ronde-naam">${r.name}</span>
+      <div style="display:flex;align-items:center;gap:6px;">${badge}<span style="font-size:16px;color:var(--text3);" id="arrow-${i}">▼</span></div>
     </div>`;
 
-    if (r.periode) {
-      html += `<div class="ronde-meta">📅 ${r.periode}</div>`;
-    }
-    if (r.eerste_wedstrijd) {
-      html += `<div class="ronde-meta">⚽ ${r.eerste_wedstrijd} → ${r.laatste_wedstrijd}</div>`;
-    }
-    if (r.handmatig) {
-      html += `<div class="ronde-meta" style="color:#e65100;">📝 Scores handmatig ingevoerd na afloop ronde</div>`;
-    }
+    if (r.periode) html += `<div class="ronde-meta">📅 ${r.periode}</div>`;
+    if (r.eerste_wedstrijd) html += `<div class="ronde-meta">⚽ ${r.eerste_wedstrijd} → ${r.laatste_wedstrijd}</div>`;
 
     if (r.participants.length > 0) {
-      html += `<div class="ronde-meta" style="margin-top:6px;">${r.participants.length} deelnemers · pot: <strong>€${isPot}</strong>`;
+      html += `<div class="ronde-meta" style="margin-top:4px;">${r.participants.length} deelnemers · pot: <strong>€${pot}</strong>`;
       if (r.inleg === 20) html += ` <span style="color:var(--orange);font-weight:700;">(Superronde €20)</span>`;
       html += `</div>`;
     }
 
-    if (isAfgelopen) {
-      const pot = r.participants.length * r.inleg;
-      html += `<div style="margin-top:6px;font-size:13px;">
-        🥇 <strong>${r.winner1}</strong> — €${Math.floor(pot*0.75)}<br>
-        🥈 <strong>${r.winner2}</strong> — €${pot - Math.floor(pot*0.75)}
-      </div>`;
+    // Uitklapbaar detail
+    html += `<div id="ronde-detail-${i}" style="display:none;margin-top:10px;">`;
+
+    if (r.participants.length === 0) {
+      html += '<div class="empty-state" style="padding:8px 0;">Nog geen deelnemers.</div>';
+    } else {
+      // Ranglijst van deze ronde
+      const ranking = buildRoundRanking(i);
+      const prize1 = Math.floor(pot * 0.75);
+      const prize2 = pot - prize1;
+
+      html += `<table class="rank-table"><thead><tr>
+        <th>#</th><th>Naam</th>`;
+      if (r.handmatig) html += `<th style="text-align:right">Totaal</th>`;
+      html += `<th style="text-align:right">Ronde pts</th>`;
+      if (isAfgelopen) html += `<th style="text-align:right">Prijs</th>`;
+      html += `</tr></thead><tbody>`;
+
+      ranking.forEach((item, pos) => {
+        const medal = pos===0 ? '🥇' : pos===1 ? '🥈' : pos===2 ? '🥉' : (pos+1)+'.';
+        const cls2 = pos===0 ? 'rank-gold' : pos===1 ? 'rank-silver' : pos===2 ? 'rank-bronze' : 'rank-pos';
+        const prijs = isAfgelopen && pos===0 ? `<td style="text-align:right;color:var(--success);font-weight:700;">€${prize1}</td>`
+                    : isAfgelopen && pos===1 ? `<td style="text-align:right;color:var(--success);font-weight:700;">€${prize2}</td>`
+                    : isAfgelopen ? '<td></td>' : '';
+        const totaalCol = r.handmatig ? `<td style="text-align:right;color:var(--text3);font-size:12px;">${item.totaal !== null ? item.totaal : '—'}</td>` : '';
+        html += `<tr>
+          <td class="${cls2}">${medal}</td>
+          <td style="font-weight:600">${item.name}</td>
+          ${totaalCol}
+          <td class="rank-pts">${item.pts !== null ? item.pts : '—'}</td>
+          ${prijs}
+        </tr>`;
+      });
+      html += '</tbody></table>';
     }
 
-    html += '</div>';
+    html += '</div></div>';
   });
 
   el.innerHTML = html || '<div class="empty-state">Geen rondes geconfigureerd.</div>';
+}
+
+function toggleRondeDetail(idx) {
+  const el = document.getElementById('ronde-detail-' + idx);
+  const arrow = document.getElementById('arrow-' + idx);
+  if (!el) return;
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.textContent = open ? '▼' : '▲';
 }
 
 // ============================================================
