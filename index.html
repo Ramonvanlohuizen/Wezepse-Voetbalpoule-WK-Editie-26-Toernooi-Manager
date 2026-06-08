@@ -693,6 +693,9 @@ function setScoreByIdx(input) {
   const rondePts = (!isNaN(v) && input.value.trim() !== '') ? (v - vorigTotaal) : '—';
   const rptsEl = document.getElementById('rpts-' + rIdx + '-' + pIdx);
   if (rptsEl) rptsEl.textContent = rondePts;
+  // Update ranglijst en winnaars live
+  autoSetWinners(rIdx);
+  renderHuidigeRonde();
   queueSave();
 }
 
