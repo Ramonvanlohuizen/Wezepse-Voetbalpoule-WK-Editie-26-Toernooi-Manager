@@ -482,8 +482,8 @@ function renderRondesOverzicht() {
 
   let html = '';
   state.rounds.forEach((r, i) => {
-    const isAfgelopen = r.winner1 && r.winner2;
-    const isActief = !isAfgelopen && r.participants.length > 0;
+    const isAfgelopen = r.gesloten === true;
+    const isActief = !isAfgelopen && r.participants.length > 0 && !r.gesloten;
     const pot = r.participants.length * r.inleg;
 
     let cls = 'ronde-kaart';
@@ -569,7 +569,7 @@ function toggleRondeDetail(idx) {
 // ============================================================
 function renderBeheer() {
   const card = document.getElementById('rondes-beheer-card');
-  const content = document.getElementById('rondes-beheer-content');
+  const beheerEl = document.getElementById('rondes-beheer-content');
   if (!card) return;
 
   card.style.display = isAdmin ? 'block' : 'none';
@@ -580,7 +580,7 @@ function renderBeheer() {
   sel.value = currentRound;
 
   const r = state.rounds[currentRound] || state.rounds[0];
-  if (!r) { content.innerHTML = ''; return; }
+  if (!r) { beheerEl.innerHTML = ''; return; }
 
   const pot = r.participants.length * r.inleg;
   const pOpts = ['<option value="">— kies —</option>',
@@ -659,7 +659,7 @@ html += '</div>';
     </div>`;
   }
 
-  content.innerHTML = html;
+  beheerEl.innerHTML = html;
 }
 
 function toggleParticipant(rIdx, pname) {
