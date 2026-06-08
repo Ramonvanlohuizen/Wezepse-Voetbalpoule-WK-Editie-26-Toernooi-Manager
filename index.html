@@ -114,13 +114,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
       <div class="card-header"><span class="card-title">Alle Rondes</span></div>
       <div class="card-body" id="alle-rondes-body"></div>
     </div>
-    <div class="card" id="beheer-card" style="display:none;">
-      <div class="card-header">
-        <span class="card-title">Ronde Beheer</span>
-        <select id="ronde-select" class="win-select" onchange="currentRonde=parseInt(this.value);renderBeheer()"></select>
-      </div>
-      <div class="card-body" id="beheer-body"></div>
-    </div>
+
   </div>
 
   <!-- PRIJZEN TAB -->
@@ -508,7 +502,6 @@ function toggleDeelnemer(rIdx, naam) {
   if (i >= 0) r.deelnemers.splice(i, 1);
   else r.deelnemers.push(naam);
   queueSave();
-  renderBeheer();
   renderStand();
 }
 
@@ -590,7 +583,6 @@ function toggleBetaald(i) {
 function renderAll() {
   renderStand();
   renderAlleRondes();
-  renderBeheer();
   renderPrijzen();
   renderDeelnemers();
 }
