@@ -255,6 +255,7 @@ async function loadState() {
             state.rounds[i].winner1 = sr.winner1 || '';
             state.rounds[i].winner2 = sr.winner2 || '';
             state.rounds[i].scores = (sr.scores && typeof sr.scores === 'object') ? sr.scores : {};
+            state.rounds[i].gesloten = sr.gesloten === true;
           }
         });
       }
@@ -385,12 +386,12 @@ function renderAll() {
 }
 
 function getHuidigeRonde() {
-  // Huidige ronde = eerste ronde met deelnemers maar nog geen 2 winnaars
+  // Huidige ronde = eerste ronde met deelnemers die niet gesloten is
   for (let i = 0; i < state.rounds.length; i++) {
     const r = state.rounds[i];
-    if (r.participants.length > 0 && (!r.winner1 || !r.winner2)) return i;
+    if (r.participants.length > 0 && !r.gesloten) return i;
   }
-  // Als alle rondes afgerond: laatste met deelnemers
+  // Als alle rondes gesloten: laatste met deelnemers
   for (let i = state.rounds.length - 1; i >= 0; i--) {
     if (state.rounds[i].participants.length > 0) return i;
   }
@@ -409,33 +410,46 @@ function renderHuidigeRonde() {
   }
   card.style.display = 'block';
   const r = state.rounds[idx];
-  titel.textContent = '📊 ' + r.name + ' — Ranglijst';
+  const gesloten = r.gesloten === true;
+  titel.textContent = (gesloten ? '✅ ' : '📊 ') + r.name + ' — Stand';
 
-  // Build ranking for this round
   const ranking = buildRoundRanking(idx);
-  if (ranking.length === 0) {
-    content.innerHTML = '<div class="empty-state">Nog geen scores ingevoerd voor deze ronde.</div>';
-    return;
-  }
-
   const pot = r.participants.length * r.inleg;
   const prize1 = Math.floor(pot * 0.75);
   const prize2 = pot - prize1;
 
-  let html = `<p style="font-size:12px;color:var(--text3);margin-bottom:8px;">
-    ${r.participants.length} deeln. · pot: €${pot} · 1e: €${prize1} · 2e: €${prize2}
-  </p>`;
-  // Auto winnaars instellen
-  autoSetWinners(idx);
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+    <span style="font-size:12px;color:var(--text3);">${r.participants.length} deeln. · pot: <strong>€${pot}</strong> · 🥇€${prize1} · 🥈€${prize2}</span>`;
+
+  if (isAdmin) {
+    if (!gesloten) {
+      html += `<button class="btn btn-primary btn-sm" onclick="sluitRonde(${idx})">✅ Ronde afsluiten</button>`;
+    } else {
+      html += `<button class="btn btn-outline btn-sm" onclick="herOpenRonde(${idx})">↩️ Heropenen</button>`;
+    }
+  }
+  html += '</div>';
+
+  if (ranking.length === 0) {
+    html += '<div class="empty-state">Nog geen scores ingevoerd.</div>';
+    content.innerHTML = html;
+    return;
+  }
+
+  // Auto winnaars
+  if (!gesloten) autoSetWinners(idx);
 
   const isHandmatig = r.handmatig;
-  const totaalHeader = isHandmatig ? '<th style="text-align:right;color:rgba(255,255,255,.6);">Totaal</th>' : '';
-  html += '<table class="rank-table"><thead><tr><th>#</th><th>Naam</th>' + totaalHeader + '<th style="text-align:right">Ronde pts</th></tr></thead><tbody>';
+  html += '<table class="rank-table"><thead><tr><th>#</th><th>Naam</th>';
+  if (isHandmatig) html += '<th style="text-align:right;font-size:10px;opacity:.7;">Totaal</th>';
+  html += '<th style="text-align:right">Punten</th></tr></thead><tbody>';
+
   ranking.forEach((item, i) => {
-    const cls = i===0 ? 'rank-gold' : i===1 ? 'rank-silver' : i===2 ? 'rank-bronze' : 'rank-pos';
     const medal = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : (i+1)+'.';
+    const cls = i===0 ? 'rank-gold' : i===1 ? 'rank-silver' : i===2 ? 'rank-bronze' : 'rank-pos';
     const totaalCol = isHandmatig ? `<td style="text-align:right;color:var(--text3);font-size:12px;">${item.totaal !== null ? item.totaal : '—'}</td>` : '';
-    html += `<tr>
+    const winnaarStyle = (i===0||i===1) && gesloten ? 'background:#f0faf5;' : '';
+    html += `<tr style="${winnaarStyle}">
       <td class="${cls}">${medal}</td>
       <td style="font-weight:600">${item.name}</td>
       ${totaalCol}
@@ -446,54 +460,20 @@ function renderHuidigeRonde() {
   content.innerHTML = html;
 }
 
-function buildRoundRanking(idx) {
-  const r = state.rounds[idx];
-  if (!r || r.participants.length === 0) return [];
-
-  let items = r.participants.map(name => {
-    let pts = null;
-    let totaal = null; // Scorito lopend totaal
-    if (r.handmatig) {
-      totaal = r.scores && r.scores[name] !== undefined ? r.scores[name] : null;
-      if (totaal !== null) {
-        let vorigTotaal = 0;
-        for (let i = 0; i < idx; i++) {
-          const prev = state.rounds[i];
-          if (prev.handmatig && prev.scores && prev.scores[name] !== undefined) {
-            vorigTotaal = prev.scores[name];
-          }
-        }
-        pts = totaal - vorigTotaal;
-      }
-    } else {
-      pts = state.scoritoScores[name] !== undefined ? state.scoritoScores[name] : null;
-      totaal = pts; // voor scorito rondes is totaal = pts
-    }
-    return {name, pts, totaal};
-  });
-
-  // Sort: players with scores first, then by points desc
-  items.sort((a, b) => {
-    if (a.pts === null && b.pts === null) return 0;
-    if (a.pts === null) return 1;
-    if (b.pts === null) return -1;
-    return b.pts - a.pts;
-  });
-  return items;
+function sluitRonde(idx) {
+  if (!confirm('Ronde afsluiten? De top 2 wordt als winnaar geregistreerd.')) return;
+  autoSetWinners(idx);
+  state.rounds[idx].gesloten = true;
+  queueSave();
+  renderAll();
 }
 
-// Automatisch winnaars instellen op basis van ranking
-function autoSetWinners(idx) {
-  const ranking = buildRoundRanking(idx);
-  const r = state.rounds[idx];
-  // Alleen automatisch instellen als er genoeg deelnemers met scores zijn
-  const metScore = ranking.filter(x => x.pts !== null);
-  if (metScore.length >= 2) {
-    const changed = r.winner1 !== metScore[0].name || r.winner2 !== metScore[1].name;
-    r.winner1 = metScore[0].name;
-    r.winner2 = metScore[1].name;
-    if (changed) queueSave();
-  }
+function herOpenRonde(idx) {
+  state.rounds[idx].gesloten = false;
+  state.rounds[idx].winner1 = '';
+  state.rounds[idx].winner2 = '';
+  queueSave();
+  renderAll();
 }
 
 function renderRondesOverzicht() {
