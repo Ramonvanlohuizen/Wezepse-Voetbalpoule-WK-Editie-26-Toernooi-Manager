@@ -6,109 +6,111 @@
 <title>Wezepse Voetbalpoule WK 2026</title>
 <style>
 :root{
-  --navy:#1a2a6c;--orange:#e87722;--orange2:#f59b3d;--white:#fff;
-  --bg:#f4f6fb;--card:#fff;--text1:#1a2a6c;--text2:#444;--text3:#888;
-  --light:#e0e6f0;--danger:#c0392b;--success:#27ae60;--radius:12px;
-  --shadow:0 2px 12px rgba(26,42,108,.10);
+  --navy:#1a2a6c;--navy2:#243080;--orange:#e87722;--orange2:#f59b3d;--white:#fff;
+  --bg:#eef1f8;--card:#fff;--text1:#1a2a6c;--text2:#444;--text3:#888;
+  --light:#dde3f0;--danger:#c0392b;--success:#1e9e5a;--radius:14px;
+  --shadow:0 4px 20px rgba(26,42,108,.12);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text1);min-height:100vh;}
+
+/* HEADER */
 .site-header{background:var(--navy);padding:0;display:block;overflow:hidden;}
 .header-banner{width:100%;height:200px;object-fit:cover;object-position:center center;display:block;}
-.header-logo-row{display:flex;align-items:center;justify-content:center;padding:8px 0 0 0;cursor:pointer;user-select:none;}
-.header-logo{height:72px;width:auto;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4));}
-.header-title{color:var(--white);font-size:22px;font-weight:800;letter-spacing:1px;padding:4px 0 10px;text-align:center;}
-.site-nav{background:var(--navy);border-bottom:3px solid var(--orange);position:sticky;top:0;z-index:100;}
-.nav-inner{display:flex;align-items:center;justify-content:center;padding:0 8px;max-width:600px;margin:0 auto;gap:8px;}
-.nav-btn{background:none;border:none;color:rgba(255,255,255,.7);font-size:13px;font-weight:700;padding:12px 16px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:.2s;white-space:nowrap;text-transform:uppercase;letter-spacing:1px;}
+
+/* NAV */
+.site-nav{background:var(--navy);border-bottom:3px solid var(--orange);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.nav-inner{display:flex;align-items:center;justify-content:center;padding:0;max-width:600px;margin:0 auto;gap:0;}
+.nav-btn{background:none;border:none;color:rgba(255,255,255,.6);font-size:12px;font-weight:700;padding:13px 20px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:.2s;white-space:nowrap;text-transform:uppercase;letter-spacing:1.5px;}
 .nav-btn.active{color:var(--orange);border-bottom:3px solid var(--orange);}
-.nav-right{display:flex;align-items:center;gap:6px;}
+.nav-btn:hover{color:var(--white);}
 .save-txt{font-size:11px;color:rgba(255,255,255,.6);}
-#admin-indicator{background:var(--orange);color:var(--white);font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;display:none;}
-.main{max-width:600px;margin:0 auto;padding:12px 10px 60px;}
+
+/* MAIN */
+.main{max-width:600px;margin:0 auto;padding:14px 10px 70px;}
 .sec{display:none;}.sec.active{display:block;}
-.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;}
-.card-header{background:linear-gradient(135deg,var(--navy),#2a3d8c);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
-.card-title{color:var(--white);font-size:15px;font-weight:700;}
-.card-body{padding:12px 14px;}
 
-/* Ronde kaarten */
-.ronde-kaart{border:1.5px solid var(--light);border-radius:10px;padding:12px;margin-bottom:10px;}
-.ronde-kaart.actief{border-color:var(--orange);background:#fffbf5;}
-.ronde-kaart.afgelopen{background:#f8f8f8;opacity:.8;}
-.ronde-naam{font-size:15px;font-weight:700;color:var(--navy);}
-.ronde-meta{font-size:12px;color:var(--text3);margin:3px 0 6px;}
-.ronde-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;}
+/* CARDS */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;border:1px solid rgba(26,42,108,.07);}
+.card-header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;}
+.card-title{color:var(--white);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.card-body{padding:14px;}
+
+/* RONDE KAARTEN */
+.ronde-kaart{border:1.5px solid var(--light);border-radius:10px;padding:13px;margin-bottom:10px;transition:.2s;background:var(--white);}
+.ronde-kaart:last-child{margin-bottom:0;}
+.ronde-kaart.actief{border-color:var(--orange);background:linear-gradient(135deg,#fffbf5,#fff8ee);box-shadow:0 2px 12px rgba(232,119,34,.15);}
+.ronde-kaart.afgelopen{background:#f7f9fc;opacity:.85;}
+.ronde-naam{font-size:14px;font-weight:700;color:var(--navy);}
+.ronde-meta{font-size:12px;color:var(--text3);margin:3px 0 4px;line-height:1.5;}
+.ronde-badge{display:inline-block;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;margin-left:6px;letter-spacing:.5px;text-transform:uppercase;}
 .badge-actief{background:#fff3e0;color:#e65100;}
-.badge-afgelopen{background:#e8f5e9;color:#2e7d32;}
-.badge-gepland{background:#e3f2fd;color:#1565c0;}
+.badge-afgelopen{background:#e6f7ef;color:#1e7e4a;}
+.badge-gepland{background:#e8eeff;color:#2a4db0;}
 
-/* Deelnemer toggles */
-.round-grid{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
-.player-btn{border:2px solid var(--light);background:var(--white);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;color:var(--text2);}
-.player-btn.in{border-color:var(--orange);background:var(--orange);color:var(--white);}
-
-/* Score invoer */
-.score-table{width:100%;border-collapse:collapse;font-size:13px;}
-.score-table th{padding:6px 8px;background:var(--navy);color:var(--white);text-align:left;font-size:12px;}
-.score-table td{padding:5px 8px;border-bottom:1px solid var(--light);}
-.score-table tr:last-child td{border-bottom:none;}
-.score-input{width:60px;border:1.5px solid var(--light);border-radius:6px;padding:3px 6px;font-size:13px;text-align:center;}
-.score-input:focus{border-color:var(--orange);outline:none;}
-
-/* Ranglijst */
+/* RANG TABEL */
 .rank-table{width:100%;border-collapse:collapse;font-size:13px;}
-.rank-table th{padding:6px 8px;background:var(--navy);color:var(--white);text-align:left;font-size:12px;}
-.rank-table td{padding:7px 8px;border-bottom:1px solid var(--light);}
+.rank-table th{padding:8px 10px;background:var(--navy);color:rgba(255,255,255,.8);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.8px;}
+.rank-table td{padding:9px 10px;border-bottom:1px solid var(--light);}
 .rank-table tr:last-child td{border-bottom:none;}
+.rank-table tr:hover td{background:#f5f7fc;}
 .rank-pos{font-weight:800;color:var(--text3);width:28px;}
-.rank-gold{color:#c9a400;font-weight:800;}
-.rank-silver{color:#888;font-weight:800;}
-.rank-bronze{color:#a05010;font-weight:800;}
-.rank-pts{font-weight:700;color:var(--orange);text-align:right;}
-.rank-euro{font-size:12px;color:var(--success);font-weight:700;text-align:right;}
+.rank-gold{color:#c9a400;font-weight:800;font-size:15px;}
+.rank-silver{color:#888;font-weight:800;font-size:15px;}
+.rank-bronze{color:#a05010;font-weight:800;font-size:15px;}
+.rank-pts{font-weight:800;color:var(--orange);text-align:right;font-size:14px;}
 
-/* Winnaar selectie */
-.win-select{border:1.5px solid var(--light);border-radius:6px;padding:4px 8px;font-size:13px;color:var(--text2);background:var(--white);cursor:pointer;}
+/* SCORE TABEL */
+.score-table{width:100%;border-collapse:collapse;font-size:13px;}
+.score-table th{padding:7px 10px;background:var(--navy);color:rgba(255,255,255,.8);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.8px;}
+.score-table td{padding:6px 10px;border-bottom:1px solid var(--light);}
+.score-table tr:last-child td{border-bottom:none;}
+.score-input{width:70px;border:1.5px solid var(--light);border-radius:8px;padding:5px 8px;font-size:13px;text-align:center;transition:.2s;}
+.score-input:focus{border-color:var(--orange);outline:none;box-shadow:0 0 0 3px rgba(232,119,34,.15);}
 
-/* Prijzen */
-.prijs-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--light);}
-.prijs-row:last-child{border-bottom:none;}
-.prijs-label{font-size:14px;color:var(--text2);}
-.prijs-bedrag{font-size:15px;font-weight:700;color:var(--success);}
-
-/* Deelnemers */
-.deeln-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--light);}
+/* DEELNEMERS */
+.deeln-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--light);}
 .deeln-row:last-child{border-bottom:none;}
 .deeln-naam{font-size:14px;font-weight:600;color:var(--text1);}
-.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;}
-.badge-betaald{background:#e8f5e9;color:#2e7d32;}
-.badge-open{background:#fce4ec;color:#c62828;}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;letter-spacing:.3px;}
+.badge-betaald{background:#e6f7ef;color:#1e7e4a;}
+.badge-open{background:#fde8e8;color:#c0392b;}
 
-/* Buttons */
-.btn{display:inline-block;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;}
+/* PRIJZEN */
+.prijs-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--light);}
+.prijs-row:last-child{border-bottom:none;}
+.prijs-label{font-size:14px;color:var(--text2);}
+.prijs-bedrag{font-size:15px;font-weight:800;color:var(--success);}
+
+/* PLAYER BUTTONS */
+.round-grid{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0;}
+.player-btn{border:2px solid var(--light);background:var(--white);border-radius:20px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.2s;color:var(--text2);}
+.player-btn.in{border-color:var(--orange);background:var(--orange);color:var(--white);}
+.player-btn:hover{border-color:var(--navy);color:var(--navy);}
+.player-btn.in:hover{background:var(--orange2);}
+
+/* WINNAAR SELECT */
+.win-select{border:1.5px solid var(--light);border-radius:8px;padding:5px 10px;font-size:13px;color:var(--text2);background:var(--white);cursor:pointer;transition:.2s;}
+.win-select:focus{border-color:var(--orange);outline:none;}
+
+/* HINTS */
+.scorito-hint{background:#eef2ff;border-left:4px solid var(--navy2);padding:9px 12px;border-radius:0 8px 8px 0;font-size:12px;color:var(--text2);margin:10px 0;line-height:1.5;}
+
+/* LEGE STATE */
+.empty-state{color:var(--text3);font-size:13px;padding:16px 0;text-align:center;}
+
+/* BUTTONS */
+.btn{display:inline-block;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:.3px;}
 .btn-primary{background:var(--orange);color:var(--white);}
 .btn-primary:hover{background:var(--orange2);}
-.btn-outline{background:transparent;border:2px solid var(--navy);color:var(--navy);}
-.btn-danger{background:var(--danger);color:var(--white);}
-.btn-sm{padding:4px 10px;font-size:12px;}
-.btn-success{background:var(--success);color:var(--white);}
 
-/* Tabs sub */
-.sub-tabs{display:flex;gap:6px;margin-bottom:12px;border-bottom:2px solid var(--light);padding-bottom:8px;}
-.sub-tab{background:none;border:none;padding:6px 12px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-radius:6px 6px 0 0;transition:.2s;}
-.sub-tab.active{background:var(--orange);color:var(--white);}
-
-/* Lege state */
-.empty-state{color:var(--text3);font-size:13px;padding:12px 0;text-align:center;}
-
-/* Scorito info */
-.scorito-hint{background:#e3f2fd;border-left:4px solid var(--navy);padding:8px 12px;border-radius:0 6px 6px 0;font-size:12px;color:var(--text2);margin:8px 0;}
+/* ADMIN BALK */
+#admin-bar{background:linear-gradient(135deg,var(--navy),var(--navy2));text-align:center;padding:4px 8px;min-height:22px;border-bottom:1px solid rgba(255,255,255,.1);}
 
 @media(max-width:400px){
-  .header-title{font-size:18px;}
-  .nav-btn{font-size:12px;padding:10px 7px;}
-  .card-body{padding:10px;}
+  .nav-btn{font-size:11px;padding:12px 13px;letter-spacing:.8px;}
+  .card-body{padding:11px;}
+  .main{padding:10px 8px 70px;}
 }
 </style>
 </head>
@@ -126,9 +128,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 
   </div>
 </nav>
-<div style="background:var(--navy);text-align:center;padding:2px 8px;min-height:18px;">
-  <span class="save-txt" id="save-txt" style="font-size:11px;color:rgba(255,255,255,.6);"></span>
-  <span id="admin-indicator" onclick="saveState()" style="cursor:pointer;background:var(--orange);color:var(--white);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;display:none;">BEHEER AAN · 💾</span>
+<div id="admin-bar">
+  <span class="save-txt" id="save-txt"></span>
+  <span id="admin-indicator" onclick="saveState()" style="cursor:pointer;background:var(--orange);color:var(--white);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:none;">⚙️ BEHEER AAN · 💾</span>
 </div>
 
 <main class="main">
@@ -423,13 +425,20 @@ function renderHuidigeRonde() {
   let html = `<p style="font-size:12px;color:var(--text3);margin-bottom:8px;">
     ${r.participants.length} deeln. · pot: €${pot} · 1e: €${prize1} · 2e: €${prize2}
   </p>`;
-  html += '<table class="rank-table"><thead><tr><th>#</th><th>Naam</th><th style="text-align:right">Pts</th></tr></thead><tbody>';
+  // Auto winnaars instellen
+  autoSetWinners(idx);
+
+  const isHandmatig = r.handmatig;
+  const totaalHeader = isHandmatig ? '<th style="text-align:right;color:rgba(255,255,255,.6);">Totaal</th>' : '';
+  html += '<table class="rank-table"><thead><tr><th>#</th><th>Naam</th>' + totaalHeader + '<th style="text-align:right">Ronde pts</th></tr></thead><tbody>';
   ranking.forEach((item, i) => {
     const cls = i===0 ? 'rank-gold' : i===1 ? 'rank-silver' : i===2 ? 'rank-bronze' : 'rank-pos';
     const medal = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : (i+1)+'.';
+    const totaalCol = isHandmatig ? `<td style="text-align:right;color:var(--text3);font-size:12px;">${item.totaal !== null ? item.totaal : '—'}</td>` : '';
     html += `<tr>
       <td class="${cls}">${medal}</td>
       <td style="font-weight:600">${item.name}</td>
+      ${totaalCol}
       <td class="rank-pts">${item.pts !== null ? item.pts : '—'}</td>
     </tr>`;
   });
@@ -443,26 +452,24 @@ function buildRoundRanking(idx) {
 
   let items = r.participants.map(name => {
     let pts = null;
+    let totaal = null; // Scorito lopend totaal
     if (r.handmatig) {
-      // scores = Scorito lopend totaal na deze ronde
-      // Ronde-punten = totaal deze ronde - som van alle vorige handmatige rondes
-      const totaalDezeRonde = r.scores && r.scores[name] !== undefined ? r.scores[name] : null;
-      if (totaalDezeRonde !== null) {
-        // Bereken totaal van alle vorige handmatige rondes voor deze speler
+      totaal = r.scores && r.scores[name] !== undefined ? r.scores[name] : null;
+      if (totaal !== null) {
         let vorigTotaal = 0;
         for (let i = 0; i < idx; i++) {
           const prev = state.rounds[i];
           if (prev.handmatig && prev.scores && prev.scores[name] !== undefined) {
-            // Gebruik het totaal van de LAATSTE vorige ronde (cumulatief)
             vorigTotaal = prev.scores[name];
           }
         }
-        pts = totaalDezeRonde - vorigTotaal;
+        pts = totaal - vorigTotaal;
       }
     } else {
       pts = state.scoritoScores[name] !== undefined ? state.scoritoScores[name] : null;
+      totaal = pts; // voor scorito rondes is totaal = pts
     }
-    return {name, pts};
+    return {name, pts, totaal};
   });
 
   // Sort: players with scores first, then by points desc
@@ -473,6 +480,20 @@ function buildRoundRanking(idx) {
     return b.pts - a.pts;
   });
   return items;
+}
+
+// Automatisch winnaars instellen op basis van ranking
+function autoSetWinners(idx) {
+  const ranking = buildRoundRanking(idx);
+  const r = state.rounds[idx];
+  // Alleen automatisch instellen als er genoeg deelnemers met scores zijn
+  const metScore = ranking.filter(x => x.pts !== null);
+  if (metScore.length >= 2) {
+    const changed = r.winner1 !== metScore[0].name || r.winner2 !== metScore[1].name;
+    r.winner1 = metScore[0].name;
+    r.winner2 = metScore[1].name;
+    if (changed) queueSave();
+  }
 }
 
 function renderRondesOverzicht() {
@@ -612,30 +633,22 @@ function renderBeheer() {
 html += '</div>';
   }
 
-  // Winnaar selectie
-  html += `<div style="margin-top:12px;">
-    <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:8px;">🏆 Winnaars aanwijzen</div>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:13px;width:60px;">🥇 1e:</span>
-        <select class="win-select" onchange="setWinner(${currentRound},1,this.value)">${pOpts}</select>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:13px;width:60px;">🥈 2e:</span>
-        <select class="win-select" onchange="setWinner(${currentRound},2,this.value)">${pOpts}</select>
-      </div>
-    </div>
-  </div>`;
+  // Winnaars auto tonen
+  autoSetWinners(currentRound);
+  const updatedR = state.rounds[currentRound];
+  if (updatedR.winner1 || updatedR.winner2) {
+    html += `<div style="margin-top:12px;background:#e6f7ef;border-radius:10px;padding:12px;">
+      <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:8px;">🏆 Winnaars (automatisch)</div>
+      <div style="font-size:13px;margin-bottom:4px;">🥇 <strong>${updatedR.winner1 || '—'}</strong></div>
+      <div style="font-size:13px;">🥈 <strong>${updatedR.winner2 || '—'}</strong></div>
+    </div>`;
+  } else {
+    html += `<div style="margin-top:12px;background:#f5f5f5;border-radius:10px;padding:12px;font-size:13px;color:var(--text3);">
+      🏆 Winnaars worden automatisch bepaald zodra scores zijn ingevuld.
+    </div>`;
+  }
 
-  // Fix select values
   content.innerHTML = html;
-  
-  // Set winner selects
-  setTimeout(() => {
-    const sels = content.querySelectorAll('select');
-    if (sels[0]) sels[0].value = r.winner1 || '';
-    if (sels[1]) sels[1].value = r.winner2 || '';
-  }, 0);
 }
 
 function toggleParticipant(rIdx, pname) {
