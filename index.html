@@ -344,9 +344,15 @@ function renderAlleRondes(){
       </div>`;
     if(gesloten&&r.winner1){
       const rp1=Math.floor(pot*.75),rp2=pot-rp1;
-      html+=`<div style="padding:0 16px 12px;display:flex;gap:16px;font-size:13px;">
-        <span>🥇 <strong>${r.winner1}</strong> · €${rp1}</span>
-        <span>🥈 <strong>${r.winner2}</strong> · €${rp2}</span>
+      html+=`<div style="padding:0 16px 12px;display:flex;flex-direction:column;gap:6px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span>🥇 <strong>${r.winner1}</strong></span>
+          <span style="color:var(--success);font-weight:700;">€${rp1}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span>🥈 <strong>${r.winner2}</strong></span>
+          <span style="color:var(--success);font-weight:700;">€${rp2}</span>
+        </div>
       </div>`;
     }
     // Detail sectie
