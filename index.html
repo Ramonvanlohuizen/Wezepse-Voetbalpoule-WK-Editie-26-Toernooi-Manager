@@ -57,7 +57,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 .ronde-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
 .ronde-naam{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text1);}
 .ronde-sub{font-size:12px;color:var(--text2);margin-top:3px;}
-.ronde-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.ronde-badge{font-size:9px;font-weight:700;padding:3px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
 .badge-actief{background:rgba(255,96,0,.15);color:var(--orange);border:1px solid rgba(255,96,0,.3);}
 .badge-afgelopen{background:rgba(39,201,106,.1);color:var(--success);border:1px solid rgba(39,201,106,.2);}
 .badge-gepland{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border);}
@@ -152,7 +152,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 
   <!-- DEELNEMERS -->
   <div class="sec" id="tab-deelnemers">
-    <div class="section-label" id="deeln-label">Deelnemers</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px;">
+    <div class="section-label" id="deeln-label" style="margin:0;">Deelnemers</div>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV()" style="font-size:11px;padding:4px 12px;border-color:var(--border);color:var(--text2);">📥 Export CSV</button>
+  </div>
     <div class="card"><div class="card-body" id="deelnemers-body"></div></div>
   </div>
 </main>
@@ -328,7 +331,7 @@ function renderAlleRondes(){
     const badgeTxt=gesloten?'✅ Afgelopen':actief?'🔥 Actief':'📅 Gepland';
     const cardCls='ronde-kaart'+(actief?' actief':'')+(gesloten?' afgelopen':'');
     html+=`<div class="${cardCls}" onclick="toggleDetail(${i})">
-      <div class="ronde-header">
+      <div class="ronde-header" style="gap:8px;">
         <div>
           <div class="ronde-naam">${r.name}</div>`;
     if(r.periode)html+=`<div class="ronde-sub">📅 ${r.periode}</div>`;
@@ -459,6 +462,74 @@ function toggleBetaald(i){state.spelers[i].betaald=!state.spelers[i].betaald;que
 
 // ── RENDER ALL ────────────────────────────────────────────
 function renderAll(){renderStand();renderAlleRondes();renderPrijzen();renderDeelnemers();}
+
+function exportCSV() {
+  const lines = [];
+  const now = new Date().toLocaleDateString('nl-NL');
+
+  // === DEELNEMERS ===
+  lines.push('=== DEELNEMERS ===');
+  lines.push('Naam,Betaald,Eindpot inleg');
+  state.spelers.forEach(sp => {
+    lines.push(`${sp.naam},${sp.betaald ? 'Ja' : 'Nee'},${sp.betaald ? '€25' : '€0'}`);
+  });
+  const betaald = state.spelers.filter(s => s.betaald).length;
+  lines.push(`Totaal betaald,${betaald} van ${state.spelers.length},€${betaald * 25}`);
+  lines.push('');
+
+  // === RONDES ===
+  lines.push('=== RONDES ===');
+  state.rondes.forEach(r => {
+    if (r.deelnemers.length === 0) return;
+    const pot = r.deelnemers.length * r.inleg;
+    const p1 = Math.floor(pot * 0.75), p2 = pot - p1;
+    lines.push('');
+    lines.push(`Ronde: ${r.name}`);
+    if (r.periode) lines.push(`Periode: ${r.periode}`);
+    if (r.eerste) lines.push(`Wedstrijden: ${r.eerste} t/m ${r.laatste}`);
+    lines.push(`Status: ${r.gesloten ? 'Afgelopen' : 'Actief'}`);
+    lines.push(`Deelnemers: ${r.deelnemers.length} | Inleg: €${r.inleg} | Pot: €${pot}`);
+    if (r.winner1) lines.push(`Winnaar 1: ${r.winner1} (€${p1}) | Winnaar 2: ${r.winner2} (€${p2})`);
+    lines.push('');
+    lines.push('Positie,Naam,Scorito Totaal,Ronde Punten');
+
+    const ranking = bouwRanking(state.rondes.indexOf(r));
+    ranking.forEach((item, i) => {
+      const pos = i === 0 ? '1e' : i === 1 ? '2e' : i === 2 ? '3e' : `${i+1}e`;
+      lines.push(`${pos},${item.naam},${item.totaal !== null ? item.totaal : '-'},${item.pts !== null ? item.pts : '-'}`);
+    });
+  });
+
+  // === PRIJZEN OVERZICHT ===
+  lines.push('');
+  lines.push('=== PRIJZEN OVERZICHT ===');
+  const eindpot = betaald * 25;
+  lines.push(`Eindpot totaal,€${eindpot}`);
+  lines.push(`1e plaats (60%),€${Math.floor(eindpot * 0.6)}`);
+  lines.push(`2e plaats (30%),€${Math.floor(eindpot * 0.3)}`);
+  lines.push(`3e plaats (10%),€${eindpot - Math.floor(eindpot * 0.6) - Math.floor(eindpot * 0.3)}`);
+  lines.push('');
+  lines.push('Ronde,Pot,1e Winnaar,Prijs 1e,2e Winnaar,Prijs 2e');
+  state.rondes.forEach(r => {
+    if (r.deelnemers.length === 0) return;
+    const pot = r.deelnemers.length * r.inleg;
+    const p1 = Math.floor(pot * 0.75), p2 = pot - p1;
+    lines.push(`${r.name},€${pot},${r.winner1 || '-'},€${p1},${r.winner2 || '-'},€${p2}`);
+  });
+
+  lines.push('');
+  lines.push(`Geëxporteerd op: ${now}`);
+
+  // Download
+  const csv = lines.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `wezepse-poule-${now.replace(/\//g,'-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 loadState();
 </script>
