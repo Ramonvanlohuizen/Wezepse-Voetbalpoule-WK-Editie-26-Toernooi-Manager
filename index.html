@@ -331,16 +331,17 @@ function renderAlleRondes(){
     const badgeTxt=gesloten?'✅ Afgelopen':actief?'🔥 Actief':'📅 Gepland';
     const cardCls='ronde-kaart'+(actief?' actief':'')+(gesloten?' afgelopen':'');
     html+=`<div class="${cardCls}" onclick="toggleDetail(${i})">
-      <div class="ronde-header" style="gap:8px;">
-        <div>
-          <div class="ronde-naam">${r.name}</div>`;
+      <div class="ronde-header" style="gap:8px;align-items:flex-start;">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div class="ronde-naam">${r.name}</div>
+            <span class="ronde-badge ${badgeCls}">${badgeTxt}</span>
+          </div>`;
     if(r.periode)html+=`<div class="ronde-sub">📅 ${r.periode}</div>`;
     if(r.eerste)html+=`<div class="ronde-sub" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">⚽ ${r.eerste} · ${r.laatste}</div>`;
     if(r.deelnemers.length>0)html+=`<div class="ronde-sub">${r.deelnemers.length} deeln. · pot €${pot}${r.inleg===20?' · <span style="color:var(--orange)">Superronde</span>':''}</div>`;
-    html+=`</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-          <span class="ronde-badge ${badgeCls}">${badgeTxt}</span>
-          <span id="arr-${i}" style="color:var(--text3);font-size:12px;">${openDetails.has(i)?"▲":"▼"}</span>
-        </div>
+    html+=`</div>
+        <span id="arr-${i}" style="color:var(--text3);font-size:12px;flex-shrink:0;">${openDetails.has(i)?"▲":"▼"}</span>
       </div>`;
     if(gesloten&&r.winner1){
       const rp1=Math.floor(pot*.75),rp2=pot-rp1;
