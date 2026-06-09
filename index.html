@@ -310,10 +310,10 @@ function renderStand(){
       ?`<button class="btn btn-outline btn-sm" onclick="herOpenRonde(${idx})">↩️ Heropenen</button>`
       :`<button class="btn btn-orange btn-sm" onclick="sluitRonde(${idx})">Afsluiten</button>`;
   }
-  html+=`</div><div style="padding:10px 16px 4px;display:flex;gap:16px;font-size:12px;color:var(--text2);">
-    <span>${r.deelnemers.length} deelnemers</span>
-    <span>Pot: <strong style="color:var(--text1);">€${pot}</strong></span>
-    <span>🥇 €${p1} · 🥈 €${p2}</span>
+  html+=`</div>
+  <div style="padding:10px 16px 4px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text2);">
+    <span>${r.deelnemers.length} deelnemers · Pot: <strong style="color:var(--text1);">€${pot}</strong></span>
+    <span>🥇 €${p1} &nbsp; 🥈 €${p2}</span>
   </div><div style="padding:0 4px 4px;">${maakRankingTabel(idx,gesloten)}</div></div>`;
   el.innerHTML=html;
 }
@@ -472,10 +472,10 @@ function exportCSV() {
   lines.push('=== DEELNEMERS ===');
   lines.push('Naam,Betaald,Eindpot inleg');
   state.spelers.forEach(sp => {
-    lines.push(`${sp.naam},${sp.betaald ? 'Ja' : 'Nee'},${sp.betaald ? '€25' : '€0'}`);
+    lines.push(`${sp.naam},${sp.betaald ? 'Ja' : 'Nee'},${sp.betaald ? 'EUR 25' : 'EUR 0'}`);
   });
   const betaald = state.spelers.filter(s => s.betaald).length;
-  lines.push(`Totaal betaald,${betaald} van ${state.spelers.length},€${betaald * 25}`);
+  lines.push(`Totaal betaald,${betaald} van ${state.spelers.length},EUR ${betaald * 25}`);
   lines.push('');
 
   // === RONDES ===
@@ -489,8 +489,8 @@ function exportCSV() {
     if (r.periode) lines.push(`Periode: ${r.periode}`);
     if (r.eerste) lines.push(`Wedstrijden: ${r.eerste} t/m ${r.laatste}`);
     lines.push(`Status: ${r.gesloten ? 'Afgelopen' : 'Actief'}`);
-    lines.push(`Deelnemers: ${r.deelnemers.length} | Inleg: €${r.inleg} | Pot: €${pot}`);
-    if (r.winner1) lines.push(`Winnaar 1: ${r.winner1} (€${p1}) | Winnaar 2: ${r.winner2} (€${p2})`);
+    lines.push(`Deelnemers: ${r.deelnemers.length} | Inleg: EUR ${r.inleg} | Pot: EUR ${pot}`);
+    if (r.winner1) lines.push(`Winnaar 1: ${r.winner1} (EUR ${p1}) | Winnaar 2: ${r.winner2} (EUR ${p2})`);
     lines.push('');
     lines.push('Positie,Naam,Scorito Totaal,Ronde Punten');
 
@@ -505,17 +505,17 @@ function exportCSV() {
   lines.push('');
   lines.push('=== PRIJZEN OVERZICHT ===');
   const eindpot = betaald * 25;
-  lines.push(`Eindpot totaal,€${eindpot}`);
-  lines.push(`1e plaats (60%),€${Math.floor(eindpot * 0.6)}`);
-  lines.push(`2e plaats (30%),€${Math.floor(eindpot * 0.3)}`);
-  lines.push(`3e plaats (10%),€${eindpot - Math.floor(eindpot * 0.6) - Math.floor(eindpot * 0.3)}`);
+  lines.push(`Eindpot totaal,EUR ${eindpot}`);
+  lines.push(`1e plaats (60%),EUR ${Math.floor(eindpot * 0.6)}`);
+  lines.push(`2e plaats (30%),EUR ${Math.floor(eindpot * 0.3)}`);
+  lines.push(`3e plaats (10%),EUR ${eindpot - Math.floor(eindpot * 0.6) - Math.floor(eindpot * 0.3)}`);
   lines.push('');
   lines.push('Ronde,Pot,1e Winnaar,Prijs 1e,2e Winnaar,Prijs 2e');
   state.rondes.forEach(r => {
     if (r.deelnemers.length === 0) return;
     const pot = r.deelnemers.length * r.inleg;
     const p1 = Math.floor(pot * 0.75), p2 = pot - p1;
-    lines.push(`${r.name},€${pot},${r.winner1 || '-'},€${p1},${r.winner2 || '-'},€${p2}`);
+    lines.push(`${r.name},EUR ${pot},${r.winner1 || '-'},EUR ${p1},${r.winner2 || '-'},EUR ${p2}`);
   });
 
   lines.push('');
@@ -523,7 +523,7 @@ function exportCSV() {
 
   // Download
   const csv = lines.join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
