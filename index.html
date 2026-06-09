@@ -498,15 +498,15 @@ function toonOpenBetalingen() {
         Graag de inleg van <strong style="color:#FF6000;">€25</strong> overmaken naar Ramon 👇
       </div>
       <div style="padding:0 16px;">`;
-    open.forEach((sp, i) => {
-      html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:${i < open.length-1 ? '1px solid #2a2c2f':'none'};">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:16px;">❌</span>
-          <span style="font-size:14px;font-weight:700;color:#fff;">${sp.naam}</span>
-        </div>
-        <span style="font-size:12px;color:#e74c3c;font-weight:700;">€25</span>
+    // Twee kolommen zodat alles op 1 screenshot past
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;margin-top:4px;">';
+    open.forEach((sp) => {
+      html += `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #222;">
+        <span style="font-size:12px;">❌</span>
+        <span style="font-size:12px;font-weight:700;color:#fff;">${sp.naam}</span>
       </div>`;
     });
+    html += '</div>';
     html += `</div>
       <div style="padding:10px 16px 14px;font-size:12px;color:#27c96a;text-align:center;border-top:1px solid #2a2c2f;margin-top:8px;">
         💚 Alvast bedankt — veel succes iedereen!
