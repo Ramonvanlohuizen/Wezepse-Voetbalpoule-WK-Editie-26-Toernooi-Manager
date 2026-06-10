@@ -191,7 +191,7 @@ const RONDE_DEF    = [{"name": "Ronde 1 (Poulefase)", "periode": "11-06 t/m 18-0
 
 let state = {
   spelers: ALLE_SPELERS.map(n => ({ naam: n, betaald: false })),
-  rondes: RONDE_DEF.map(r => ({ ...r, deelnemers:[], scores:{}, gesloten:false, winner1:'', winner2:'' })),
+  rondes: RONDE_DEF.map(r => ({ ...r, deelnemers:[], scores:{}, beginScores:{}, gesloten:false, winner1:'', winner2:'' })),
   scoritoScores: {}
 };
 let isAdmin=false, currentRonde=0, tapCount=0, tapTimer=null, saveTimer=null;
@@ -254,12 +254,13 @@ function getRondePts(rIdx,naam){
   const r=state.rondes[rIdx];if(!r)return null;
   if(r.handmatig){
     const tot=r.scores[naam]!==undefined?r.scores[naam]:null;if(tot===null)return null;
-    // Alleen poulefase rondes (index 0,1,2) trekken vorige rondes eraf
     if(rIdx <= 2){
+      // Gebruik beginscore als die is ingesteld, anders vorige ronde
+      const beginScore = r.beginScores && r.beginScores[naam] !== undefined ? r.beginScores[naam] : null;
+      if(beginScore !== null) return tot - beginScore;
       let prev=0;for(let i=0;i<rIdx;i++){const p=state.rondes[i];if(p.handmatig&&p.scores[naam]!==undefined)prev=p.scores[naam];}
       return tot-prev;
     }
-    // Overige rondes: score is direct de ronde-punten
     return tot;
   }
   return state.scoritoScores[naam]!==undefined?state.scoritoScores[naam]:null;
@@ -375,13 +376,34 @@ function renderAlleRondes(){
       html+=`</div>`;
       if(r.handmatig&&r.deelnemers.length>0){
         html+=`<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin:12px 0 4px;">Scores invullen</div>
-          <div class="hint">${i<=2?'Vul het <strong>Scorito totaalstand</strong> in. Ronde-punten worden automatisch berekend door vorige rondes af te trekken.':'Vul de <strong>Scorito ronde-punten</strong> direct in.'}</div>
+          <div class="hint">${i<=2?'Vul per deelnemer de <strong>beginscore</strong> (Scorito stand vóór deze ronde) en <strong>eindscore</strong> in. Wie vanaf ronde 1 meedoet laat beginscore op 0 staan.':'Vul de <strong>ronde-punten</strong> direct in vanuit Scorito.'}</div>
           <table class="score-table"><thead><tr><th>Deelnemer</th><th>Scorito totaal</th><th style="text-align:right">Ronde pts</th></tr></thead><tbody>`;
         r.deelnemers.forEach((naam,pIdx)=>{
           const val=r.scores[naam]!==undefined?r.scores[naam]:'';
-          let prev=0;for(let pi=0;pi<i;pi++){const p=state.rondes[pi];if(p.handmatig&&p.scores[naam]!==undefined)prev=p.scores[naam];}
-          const rpts=val!==''?(parseInt(val)-prev):'—';
-          html+=`<tr><td>${naam}</td><td><input type="number" class="score-input" value="${val}" placeholder="bijv. 142" data-ridx="${i}" data-pidx="${pIdx}" oninput="setScore(this)" onclick="event.stopPropagation()"></td><td style="text-align:right;font-weight:800;color:var(--orange);" id="rpts-${i}-${pIdx}">${i<=2?rpts:val!==''?val:'—'}</td></tr>`;
+          const beginVal=r.beginScores&&r.beginScores[naam]!==undefined?r.beginScores[naam]:'';
+          let prev=0;
+          if(beginVal!==''){prev=parseInt(beginVal);}
+          else{for(let pi=0;pi<i;pi++){const p=state.rondes[pi];if(p.handmatig&&p.scores[naam]!==undefined)prev=p.scores[naam];}}
+          const rpts=val!==''?(parseInt(val)-(isNaN(prev)?0:prev)):'—';
+          if(i<=2){
+            html+=`<tr>
+              <td>${naam}</td>
+              <td>
+                <div style="display:flex;gap:4px;align-items:center;">
+                  <input type="number" class="score-input" value="${beginVal}" placeholder="begin" data-ridx="${i}" data-pidx="${pIdx}" data-type="begin" oninput="setScore(this)" onclick="event.stopPropagation()" style="width:72px;">
+                  <span style="color:var(--text3);font-size:11px;">→</span>
+                  <input type="number" class="score-input" value="${val}" placeholder="eind" data-ridx="${i}" data-pidx="${pIdx}" data-type="eind" oninput="setScore(this)" onclick="event.stopPropagation()" style="width:72px;">
+                </div>
+              </td>
+              <td style="text-align:right;font-weight:800;color:var(--orange);" id="rpts-${i}-${pIdx}">${rpts}</td>
+            </tr>`;
+          } else {
+            html+=`<tr>
+              <td>${naam}</td>
+              <td><input type="number" class="score-input" value="${val}" placeholder="punten" data-ridx="${i}" data-pidx="${pIdx}" data-type="eind" oninput="setScore(this)" onclick="event.stopPropagation()"></td>
+              <td style="text-align:right;font-weight:800;color:var(--orange);" id="rpts-${i}-${pIdx}">${val!==''?val:'—'}</td>
+            </tr>`;
+          }
         });
         html+=`</tbody></table>`;
       }
@@ -418,13 +440,26 @@ function toggleDeelnemer(rIdx,naam){
 }
 function setScore(input){
   const rIdx=parseInt(input.dataset.ridx),pIdx=parseInt(input.dataset.pidx);
+  const type=input.dataset.type||'eind';
   const r=state.rondes[rIdx];if(!r)return;
   const naam=r.deelnemers[pIdx];if(!naam)return;
   const v=parseInt(input.value);
-  if(!isNaN(v)&&input.value.trim()!=='')r.scores[naam]=v;else delete r.scores[naam];
-  let prev=0;for(let pi=0;pi<rIdx;pi++){const p=state.rondes[pi];if(p.handmatig&&p.scores[naam]!==undefined)prev=p.scores[naam];}
+
+  if(type==='begin'){
+    if(!r.beginScores)r.beginScores={};
+    if(!isNaN(v)&&input.value.trim()!=='')r.beginScores[naam]=v;else delete r.beginScores[naam];
+  } else {
+    if(!isNaN(v)&&input.value.trim()!=='')r.scores[naam]=v;else delete r.scores[naam];
+  }
+
+  // Herbereken ronde punten
+  const eindVal=r.scores[naam]!==undefined?r.scores[naam]:null;
+  const beginVal=r.beginScores&&r.beginScores[naam]!==undefined?r.beginScores[naam]:null;
+  let prev=0;
+  if(beginVal!==null){prev=beginVal;}
+  else{for(let pi=0;pi<rIdx;pi++){const p=state.rondes[pi];if(p.handmatig&&p.scores[naam]!==undefined)prev=p.scores[naam];}}
   const el=document.getElementById('rpts-'+rIdx+'-'+pIdx);
-  if(el)el.textContent=(!isNaN(v)&&input.value.trim()!=='')?(v-prev):'—';
+  if(el)el.textContent=eindVal!==null?(eindVal-prev):'—';
   autoWinnaars(rIdx);renderStand();queueSave();
 }
 
